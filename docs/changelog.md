@@ -2,8 +2,17 @@
 
 Every configuration change to the lab, newest first. Record the "before" state (screenshot or config export in `evidence/`) before making a hardening change, so the improvement can be proven.
 
-| Date       | Host    | Change                                                 | Reason / framework | Evidence                     | Validated |
-| ---------- | ------- | ------------------------------------------------------ | ------------------ | ---------------------------- | --------- |
-| 2026-10-25 | n/a     | Repository created, network design and IP plan drafted | Project planning   | `docs/network-register.md`   | n/a       |
-| 2026-10-25 | n/a     | Obsidian Vault Created                                 | Project planning   | n/a                          | n/a       |
-| 2026-10-25 | pfSense | Insatlled pfSense Stable version 2.9.0                 | Preperation        | `journal/october/2026-10-25` | Yes       |
+| Date       | Host    | Change                                                                       | Reason / framework                                              | Evidence                     | Validated                         |
+| ---------- | ------- | ---------------------------------------------------------------------------- | --------------------------------------------------------------- | ---------------------------- | --------------------------------- |
+| 2026-10-25 | n/a     | Repository created, network design and IP plan drafted                       | Project planning                                                | `docs/network-register.md`   | n/a                               |
+| 2026-10-25 | n/a     | Obsidian vault created                                                       | Project planning                                                | n/a                          | n/a                               |
+| 2026-10-25 | VMware  | Created LAN segments DMZ, LAN, MGMT                                          | Isolated networks with fw01 as the only route between them      | `journal/october/2026-10-25` | Yes                               |
+| 2026-10-25 | fw01    | Installed pfSense stable version 2.9.0                                       | Preparation                                                     | `journal/october/2026-10-25` | Yes                               |
+| 2026-10-25 | dc01    | Hostname set to DC01                                                         | Naming convention                                               | n/a                          | Yes                               |
+| 2026-10-25 | fw01    | WAN static 192.168.1.10/24, gateway 192.168.1.2, IPv6 disabled               | Stable address for port forwards and testing; IPv6 out of scope | `journal/october/2026-10-25` | Yes                               |
+| 2026-10-25 | fw01    | Internal interfaces: LAN 10.10.20.1/24, DMZ 10.10.10.1/24, MGMT 10.10.30.1/24 | Segmentation per network design (ASD ISM networking)            | `journal/october/2026-10-25` | Yes                               |
+| 2026-10-25 | fw01    | Remapped VMware adapters to match em0 to em3 by MAC address                  | Interface order didn't match VMware's adapter order             | `journal/october/2026-10-25` | Yes, ws01 reaches LAN gateway     |
+| 2026-10-25 | ws01    | Static IP 10.10.20.50/24, gateway 10.10.20.1                                 | Temporary, to test LAN connectivity                             | `journal/october/2026-10-25` | Yes, pings fw01                   |
+| 2026-10-25 | fw01    | Setup wizard: hostname fw01, domain dundermifflin.local, timezone Melbourne  | Baseline configuration                                          | `journal/october/2026-10-25` | Yes                               |
+| 2026-10-25 | fw01    | Changed default admin password                                               | Default credentials are a known weakness                        | KeePass                      | Yes, logged in with new password  |
+| 2026-10-25 | fw01    | Renamed OPT1 to DMZ and OPT2 to MGMT                                         | Clear interface names for rules and documentation               | `journal/october/2026-10-25` | Yes, names shown in web UI        |

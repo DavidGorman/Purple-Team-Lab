@@ -13,12 +13,12 @@
             "state": {
               "type": "markdown",
               "state": {
-                "file": "docs/changelog.md",
+                "file": "docs/network-register.md",
                 "mode": "source",
                 "source": false
               },
               "icon": "lucide-file",
-              "title": "changelog"
+              "title": "network-register"
             }
           }
         ]
@@ -99,7 +99,7 @@
             "state": {
               "type": "backlink",
               "state": {
-                "file": "docs/changelog.md",
+                "file": "docs/network-register.md",
                 "collapseAll": false,
                 "extraContext": false,
                 "sortOrder": "alphabetical",
@@ -118,7 +118,7 @@
             "state": {
               "type": "outgoing-link",
               "state": {
-                "file": "docs/changelog.md",
+                "file": "docs/network-register.md",
                 "linksCollapsed": false,
                 "unlinkedCollapsed": true
               },
@@ -161,7 +161,7 @@
             "state": {
               "type": "outline",
               "state": {
-                "file": "docs/changelog.md",
+                "file": "docs/network-register.md",
                 "followCursor": false,
                 "showSearch": false,
                 "searchQuery": ""
@@ -201,19 +201,20 @@
   },
   "active": "88510f2dd800440b",
   "lastOpenFiles": [
-    "evidence/Github Creation.png",
-    "evidence/pfSense Installation.png",
-    "README.md",
-    "docs/changelog.md",
-    "evidence/Pasted image 20261025155908.png",
     "journal/October/2026-10-25.md",
     "docs/network-register.md",
+    "docs/changelog.md",
+    "evidence/Pasted image 20261025222604.png",
+    "evidence/pfSense Installation.png",
+    "evidence/Github Creation.png",
+    "docs/references.md",
+    "README.md",
+    "evidence/Pasted image 20261025155908.png",
     "Screenshots",
     "journal/October/2026-10-25-project-planning.md",
     "Templates/journal.md",
     "journal/October/Untitled.md",
     "Templates",
-    "journal/October",
-    "docs/references.md"
+    "journal/October"
   ]
 }
