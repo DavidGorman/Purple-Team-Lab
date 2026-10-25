@@ -1,4 +1,4 @@
-# YYYY-MM-DD: Short title
+# Short title
 
 Copy this file to `journal/YYYY-MM-DD-short-title.md` at the start of each session.
 

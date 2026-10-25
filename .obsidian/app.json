@@ -1,1 +1,5 @@
-{}
+{
+  "promptDelete": false,
+  "attachmentFolderPath": "evidence",
+  "alwaysUpdateLinks": true
+}
