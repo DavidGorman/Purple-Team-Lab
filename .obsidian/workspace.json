@@ -13,12 +13,12 @@
             "state": {
               "type": "markdown",
               "state": {
-                "file": "docs/network-register.md",
+                "file": "docs/changelog.md",
                 "mode": "source",
                 "source": false
               },
               "icon": "lucide-file",
-              "title": "network-register"
+              "title": "changelog"
             }
           }
         ]
@@ -99,7 +99,7 @@
             "state": {
               "type": "backlink",
               "state": {
-                "file": "docs/network-register.md",
+                "file": "docs/changelog.md",
                 "collapseAll": false,
                 "extraContext": false,
                 "sortOrder": "alphabetical",
@@ -118,7 +118,7 @@
             "state": {
               "type": "outgoing-link",
               "state": {
-                "file": "docs/network-register.md",
+                "file": "docs/changelog.md",
                 "linksCollapsed": false,
                 "unlinkedCollapsed": true
               },
@@ -161,7 +161,7 @@
             "state": {
               "type": "outline",
               "state": {
-                "file": "docs/network-register.md",
+                "file": "docs/changelog.md",
                 "followCursor": false,
                 "showSearch": false,
                 "searchQuery": ""
