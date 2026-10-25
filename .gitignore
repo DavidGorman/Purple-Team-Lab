@@ -1,0 +1,27 @@
+# VM files and large binaries never go in the repo
+*.iso
+*.ova
+*.ovf
+*.vmdk
+*.vmx
+*.vmsd
+*.vmem
+*.nvram
+*.7z
+*.gz
+
+# Secrets
+*.key
+*.pem
+*.kdbx
+.env
+secrets/
+
+# Raw packet captures can contain sensitive data; commit sanitised extracts only
+*.pcap
+*.pcapng
+
+# OS clutter
+.DS_Store
+Thumbs.db
+desktop.ini
