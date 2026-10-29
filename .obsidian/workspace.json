@@ -13,12 +13,12 @@
             "state": {
               "type": "markdown",
               "state": {
-                "file": "cloud/oracle/web-01.md",
+                "file": "cloud/oracle/account-hardening.md",
                 "mode": "source",
                 "source": false
               },
               "icon": "lucide-file",
-              "title": "web-01"
+              "title": "account-hardening"
             }
           }
         ]
@@ -199,22 +199,22 @@
       "obsidian-git:Open Git source control": false
     }
   },
-  "active": "88510f2dd800440b",
+  "active": "16d75ce64b7645ff",
   "lastOpenFiles": [
+    "cloud/oracle/networking.md",
+    "cloud/oracle/troubleshooting.md",
+    "cloud/oracle/web-01.md",
     "evidence/Pasted image 20261029131819.png",
     "evidence/Github Creation.png",
     "journal/October/2026-10-29.md",
     "cloud/oracle/journal/2026-10-29.md",
-    "cloud/oracle/web-01.md",
     "cloud/oracle/evidence",
     "cloud/oracle/journal",
-    "cloud/oracle/troubleshooting.md",
     "cloud/oracle/README.md",
     "cloud/oracle/bastion.md",
     "cloud/oracle/account-hardening.md",
     "Templates/journal.md",
     "secrets/oracle-values.md",
-    "cloud/oracle/networking.md",
     "cloud/oracle/sedJYZBZ1",
     "cloud/oracle/sedZV2t23",
     "docs/commands/linux-hardening.md",
