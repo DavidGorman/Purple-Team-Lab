@@ -13,12 +13,12 @@
             "state": {
               "type": "markdown",
               "state": {
-                "file": "journal/October/2026-10-29.md",
+                "file": "cloud/oracle/web-01.md",
                 "mode": "source",
                 "source": false
               },
               "icon": "lucide-file",
-              "title": "2026-10-29"
+              "title": "web-01"
             }
           }
         ]
@@ -201,9 +201,10 @@
   },
   "active": "88510f2dd800440b",
   "lastOpenFiles": [
-    "cloud/oracle/journal/2026-10-29.md",
-    "journal/October/2026-10-29.md",
     "evidence/Pasted image 20261029131819.png",
+    "evidence/Github Creation.png",
+    "journal/October/2026-10-29.md",
+    "cloud/oracle/journal/2026-10-29.md",
     "cloud/oracle/web-01.md",
     "cloud/oracle/evidence",
     "cloud/oracle/journal",
@@ -229,7 +230,6 @@
     "cloud",
     "evidence/pfSense-Int-Configured.png",
     "evidence/pfSense Installation.png",
-    "evidence/Github Creation.png",
     "2026-10-25.md",
     "journal/October/2026-10-25.md",
     "docs/references.md",
