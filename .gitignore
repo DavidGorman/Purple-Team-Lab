@@ -25,3 +25,9 @@ secrets/
 .DS_Store
 Thumbs.db
 desktop.ini
+
+# Oracle Cloud working notes: live system, kept private (publish a sanitised write-up instead)
+cloud/
+
+# Command notes: personal reference, kept private
+docs/commands/

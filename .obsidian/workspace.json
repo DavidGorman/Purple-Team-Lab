@@ -11,12 +11,14 @@
             "id": "88510f2dd800440b",
             "type": "leaf",
             "state": {
-              "type": "image",
+              "type": "markdown",
               "state": {
-                "file": "evidence/pfSense-Int-Configured.png"
+                "file": "cloud/oracle/account-hardening.md",
+                "mode": "source",
+                "source": false
               },
-              "icon": "lucide-image",
-              "title": "pfSense-Int-Configured"
+              "icon": "lucide-file",
+              "title": "account-hardening"
             }
           }
         ]
@@ -197,21 +199,37 @@
       "obsidian-git:Open Git source control": false
     }
   },
-  "active": "16d75ce64b7645ff",
+  "active": "88510f2dd800440b",
   "lastOpenFiles": [
-    "2026-10-25.md",
-    "docs/changelog.md",
-    "journal/October/2026-10-25.md",
+    "cloud/oracle/bastion.md",
+    "cloud/oracle/networking.md",
+    "cloud/oracle/README.md",
+    "cloud/oracle/troubleshooting.md",
+    "cloud/oracle/web-01.md",
+    "cloud/oracle/account-hardening.md",
+    "docs/commands/linux-hardening.md",
+    "docs/commands/ssh.md",
     "docs/network-register.md",
+    "docs/changelog.md",
+    "docs/commands/README.md",
+    "docs/commands/powershell.md",
+    "secrets/oracle-values.md",
+    "Templates/journal.md",
+    "cloud/oracle/sedV3b1Ba",
+    "secrets",
+    "docs/commands",
+    "cloud/oracle",
+    "cloud",
     "evidence/pfSense-Int-Configured.png",
     "evidence/pfSense Installation.png",
     "evidence/Github Creation.png",
+    "2026-10-25.md",
+    "journal/October/2026-10-25.md",
     "docs/references.md",
     "README.md",
     "evidence/Pasted image 20261025155908.png",
     "Screenshots",
     "journal/October/2026-10-25-project-planning.md",
-    "Templates/journal.md",
     "journal/October/Untitled.md",
     "Templates",
     "journal/October"
