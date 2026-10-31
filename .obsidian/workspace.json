@@ -13,12 +13,12 @@
             "state": {
               "type": "markdown",
               "state": {
-                "file": "Writeups/Server-Side Template Injection to Remote Code Execution.md",
+                "file": "README.md",
                 "mode": "source",
                 "source": false
               },
               "icon": "lucide-file",
-              "title": "Server-Side Template Injection to Remote Code Execution"
+              "title": "README"
             }
           }
         ]
@@ -201,6 +201,8 @@
   },
   "active": "9759e58640fc2321",
   "lastOpenFiles": [
+    "Writeups/Server-Side Template Injection to Remote Code Execution.md",
+    "README.md",
     "Templates/OWASP Web Security Report (Template).md",
     "evidence/Screenshot 2026-10-31 225445.png",
     "evidence/Screenshot 2026-10-31 225541.png",
@@ -210,7 +212,6 @@
     "evidence/Screenshot 2026-10-31 230801.png",
     "evidence/Screenshot 2026-10-31 230915.png",
     "evidence/Screenshot 2026-10-31 231006.png",
-    "Writeups/Server-Side Template Injection to Remote Code Execution.md",
     "Writeups",
     "secrets/oracle-values.md",
     "docs/network-register.md",
@@ -244,7 +245,6 @@
     "cloud/oracle",
     "cloud",
     "2026-10-25.md",
-    "docs/references.md",
-    "README.md"
+    "docs/references.md"
   ]
 }
