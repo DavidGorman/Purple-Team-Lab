@@ -1,5 +1,3 @@
-# Network Register
-
 Single source of truth for every VM, address and segment in the lab. Update this whenever something changes, and record the change in [changelog.md](changelog.md).
 
 ## Segments
@@ -15,14 +13,14 @@ DMZ, LAN and MGMT are VMware LAN segments: no VMware DHCP and no host adapter, s
 
 ## Hosts
 
-| Hostname | Role                    | OS                                        | Segment | IP                                   | RAM       | Status         | Notes                                     |
-| -------- | ----------------------- | ----------------------------------------- | ------- | ------------------------------------ | --------- | -------------- | ----------------------------------------- |
-| fw01     | Firewall / router / VPN | pfSense CE 2.9.0                          | All     | WAN 192.168.1.10, .1 on each segment | 1 GB      | Configured     | em0 WAN, em1 LAN, em2 DMZ, em3 MGMT       |
-| kali     | Attacker                | Kali Linux                                | WAN     | DHCP (192.168.1.x)                   | 2 GB      | Configured     | Outside the firewall                      |
-| web01    | Web server              | Ubuntu Server 24.04 LTS (minimized)       | DMZ     | 10.10.10.10 (planned)                | 2 GB      | OS installed   | Dunder Mifflin web app                    |
-| dc01     | Domain Controller, DNS  | Windows Server 2025 Standard (Server Core) | LAN    | 10.10.20.10 (planned)                | 2 GB      | Hostname set   | Managed with PowerShell                   |
-| ws01     | Workstation             | Windows 11 Enterprise (eval)              | LAN     | 10.10.20.50 (static, temporary)      | 2 to 4 GB | Network tested | Domain join pending                       |
-| siem01   | SIEM                    | Ubuntu Server 24.04 LTS (minimized)       | MGMT    | 10.10.30.10 (planned)                | 6 to 8 GB | OS installed   | Manual Wazuh install, static IP first     |
+| Hostname | Role                    | OS                                         | Segment | IP                                   | RAM       | Status         | Notes                                 |
+| -------- | ----------------------- | ------------------------------------------ | ------- | ------------------------------------ | --------- | -------------- | ------------------------------------- |
+| fw01     | Firewall / router / VPN | pfSense CE 2.9.0                           | All     | WAN 192.168.1.10, .1 on each segment | 1 GB      | Configured     | em0 WAN, em1 LAN, em2 DMZ, em3 MGMT   |
+| kali     | Attacker                | Kali Linux                                 | WAN     | DHCP (192.168.1.x)                   | 2 GB      | Configured     | Outside the firewall                  |
+| web01    | Web server              | Ubuntu Server 24.04 LTS (minimized)        | DMZ     | 10.10.10.10 (planned)                | 2 GB      | OS installed   | Dunder Mifflin web app                |
+| dc01     | Domain Controller, DNS  | Windows Server 2025 Standard (Server Core) | LAN     | 10.10.20.10 (planned)                | 2 GB      | Hostname set   | Managed with PowerShell               |
+| ws01     | Workstation             | Windows 11 Enterprise (eval)               | LAN     | 10.10.20.50 (static, temporary)      | 2 to 4 GB | Network tested | Domain join pending                   |
+| siem01   | SIEM                    | Ubuntu Server 24.04 LTS (minimized)        | MGMT    | 10.10.30.10 (planned)                | 6 to 8 GB | OS installed   | Manual Wazuh install, static IP first |
 
 ## Active Directory
 
