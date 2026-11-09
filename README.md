@@ -4,7 +4,7 @@ A segmented small-business network built in VMware, then attacked, monitored, ha
 
 The scenario: an attacker breaches a public-facing web server in the DMZ, then tries to pivot into the internal Active Directory network. The firewall rules decide whether that pivot succeeds. The hardening phase fixes both the web vulnerability and the internal weaknesses, and every change is validated by re-attacking.
 
-> **Status:** Planning. Build starts December 2026.
+> **Status:** Build in progress (Sprint 1: network and firewall).
 
 ## Skills demonstrated
 
@@ -21,10 +21,12 @@ The scenario: an attacker breaches a public-facing web server in the DMZ, then t
 
 | Segment | Subnet | Hosts |
 | --- | --- | --- |
-| WAN ("internet") | VMware NAT | Kali Linux attacker, pfSense WAN |
+| WAN (simulated internet) | 203.0.113.0/24 | Kali Linux attacker, pfSense WAN |
 | DMZ | 10.10.10.0/24 | Ubuntu web server (vulnerable PHP app) |
 | LAN | 10.10.20.0/24 | Windows Server DC, Windows 11 workstation |
 | MGMT | 10.10.30.0/24 | Wazuh SIEM |
+
+The lab has no permanent internet connection. The firewall has a maintenance uplink that is connected only for updates, and attacks run with it disconnected.
 
 Full details: [docs/network-register.md](docs/network-register.md)
 

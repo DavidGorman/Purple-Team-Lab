@@ -6,7 +6,7 @@ This policy defines what network traffic is permitted in the Purple Team Lab and
 
 | Field             | Value                                              |
 | ----------------- | -------------------------------------------------- |
-| Version           | 0.2                                                |
+| Version           | 0.3                                                |
 | Status            | Draft                                              |
 | Enforcement point | pfSense firewall                                   |
 | Related documents | [Firewall Rule Set](firewall-rules.md), [Network Register](network-register.md) |
@@ -15,6 +15,7 @@ This policy defines what network traffic is permitted in the Purple Team Lab and
 | ------- | ---------- | ------------- |
 | 0.1     | 3 Nov 2026 | Initial draft |
 | 0.2     | 3 Nov 2026 | Web server published to WAN; full tunnel VPN; added P-MGT-04, P-VPN-06, P-VPN-07; P-LAN-04 limited to the DC |
+| 0.3     | 9 Nov 2026 | WAN redefined as a simulated internet; maintenance uplink added (section 11); E-01 recorded; P-DMZ-04 limited to web01 |
 
 ## 2. Purpose and scope
 
@@ -25,6 +26,7 @@ The purpose of this policy is to segment the lab network so that each zone can o
 - The pfSense firewall and all of its interfaces
 - The LAN, DMZ, MGMT and VPN zones and every host in them
 - Remote access into the lab
+- The simulated internet (WAN) and the firewall's maintenance uplink
 - Administrative access to lab infrastructure
 
 **Out of scope**
@@ -37,7 +39,7 @@ This version describes the baseline network: every system working as intended, w
 
 ## 3. Network zones
 
-The lab is divided into five zones, each on its own firewall interface. Trust level sets how much a zone is allowed to reach, not how important its systems are.
+The lab is divided into five zones, each on its own firewall interface. The firewall also has a maintenance uplink to the real internet, which is not a zone (section 11). Trust level sets how much a zone is allowed to reach, not how important its systems are.
 
 | Zone | Purpose | Key systems | Trust level |
 | ---- | ------- | ----------- | ----------- |
@@ -45,7 +47,7 @@ The lab is divided into five zones, each on its own firewall interface. Trust le
 | DMZ | Hosts services exposed to less trusted networks | Web server (web01) | Low |
 | MGMT | Security operations and monitoring; treated as the SOC | SIEM (siem01) | High |
 | VPN | Remote access for administration and remote staff | Remote clients (tunnel subnet) | Medium, authenticated |
-| WAN | Everything outside the lab, including the internet | n/a | Untrusted |
+| WAN | Simulated internet, treated as the real internet throughout this policy | Attacker (kali) | Untrusted |
 
 ## 4. General principles
 
@@ -85,7 +87,7 @@ Each statement has an ID so firewall rules can reference it.
 - **P-DMZ-01** The DMZ shall not initiate any connection to the LAN.
 - **P-DMZ-02** web01 may reach the internet for operating system and package updates only.
 - **P-DMZ-03** web01 may send agent data to siem01. No other DMZ host inherits this permission.
-- **P-DMZ-04** DMZ hosts may use the firewall for DNS forwarding and time synchronisation.
+- **P-DMZ-04** web01 may use the firewall for DNS forwarding and time synchronisation.
 
 **MGMT**
 
@@ -153,6 +155,7 @@ Any traffic outside this policy needs a recorded exception before a rule is crea
 
 | ID  | Traffic | Reason | Date added | Review by |
 | --- | ------- | ------ | ---------- | --------- |
+| E-01 | LAN subnets to fw01 LAN address, DNS (TCP/UDP 53) | dc01 is not yet a DNS server, so workstations use fw01 directly | 9 Nov 2026 | When dc01 is promoted |
 
 Deliberate weaknesses introduced for attack scenarios will be recorded here as exceptions, so the hardening phase can show each one being closed.
 
@@ -164,3 +167,13 @@ The policy is reviewed at the end of each sprint and whenever a zone, host or ex
 - **P-CHG-02** A firewall rule change must reference the policy statement or exception ID it implements.
 - **P-CHG-03** Rules that no longer trace to a policy statement or active exception are removed at review.
 - **P-CHG-04** The firewall configuration is backed up before and after any rule change.
+
+## 11. Simulated internet and maintenance uplink
+
+The lab has no permanent connection to the real internet. This keeps attack traffic contained and separates the lab from the host PC and home network.
+
+- **P-UPL-01** The WAN zone is a simulated internet. All rules and services treat it as the real internet.
+- **P-UPL-02** The firewall's UPLINK interface is the lab's only connection to the real internet. It is disconnected by default and connected only for maintenance (updates and installs). Each connection is recorded in the change log.
+- **P-UPL-03** No inbound connections are permitted on UPLINK.
+- **P-UPL-04** Attack exercises are run with UPLINK disconnected.
+- **P-UPL-05** Hosts on the simulated internet may have a separate maintenance adapter, disconnected except for updates.

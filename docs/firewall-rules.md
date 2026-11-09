@@ -1,14 +1,15 @@
 ## 1. Addressing
 
-Servers use static addresses below each subnet's DHCP range (.100 to .200).
+WAN is a simulated internet and is treated as real (policy P-UPL-01). UPLINK is fw01's only real internet connection and stays disconnected except during maintenance (P-UPL-02). Servers use static addresses below each subnet's DHCP range (.100 to .200).
 
-| Zone | Subnet                         | fw01 interface        | Hosts                                               |
-| ---- | ------------------------------ | --------------------- | --------------------------------------------------- |
-| WAN  | 192.168.1.0/24 (VMnet8 NAT)    | 192.168.1.10 (static) | VMware NAT gateway 192.168.1.2, attacker VM (later) |
-| DMZ  | 10.10.10.0/24                  | 10.10.10.1            | web01 10.10.10.10                                   |
-| LAN  | 10.10.20.0/24                  | 10.10.20.1            | dc01 10.10.20.10, workstations via DHCP             |
-| MGMT | 10.10.30.0/24                  | 10.10.30.1            | siem01 10.10.30.10                                  |
-| VPN  | 10.10.40.0/24 (OpenVPN tunnel) | 10.10.40.1            | Remote clients                                      |
+| Zone   | Subnet                                    | fw01 interface                                 | Hosts                                          |
+| ------ | ----------------------------------------- | ---------------------------------------------- | ---------------------------------------------- |
+| WAN    | 203.0.113.0/24 (simulated internet)       | em0, 203.0.113.1                               | kali 203.0.113.50                              |
+| DMZ    | 10.10.10.0/24                             | em2, 10.10.10.1                                | web01 10.10.10.10                              |
+| LAN    | 10.10.20.0/24                             | em1, 10.10.20.1                                | dc01 10.10.20.10, ws01 10.10.20.50 (temporary) |
+| MGMT   | 10.10.30.0/24                             | em3, 10.10.30.1                                | siem01 10.10.30.10                             |
+| VPN    | 10.10.40.0/24 (OpenVPN tunnel)            | 10.10.40.1                                     | Remote clients                                 |
+| UPLINK | 192.168.1.0/24 (VMnet8 NAT), maintenance only | em4, 192.168.1.10, gateway 192.168.1.2     | None                                           |
 
 ## 2. Aliases
 
@@ -25,31 +26,36 @@ Rules refer to these aliases by name.
 | Wazuh_Enrol | Port    | 1515                                      | Agent enrolment (temporary)         |
 | Win_Admin   | Port    | 3389, 5985, 5986                          | RDP and PowerShell remoting (WinRM) |
 
-Built-in names also used: _WAN address_, _LAN address_, _DMZ address_, _MGMT address_ (fw01's own IP on that interface) and _LAN net_, _DMZ net_ (the whole subnet).
+Built-in names also used: _WAN address_, _LAN address_, _DMZ address_, _MGMT address_ (fw01's own IP on that interface) and _LAN subnets_, _DMZ subnets_, _MGMT subnets_ (the whole subnet).
 
 ## 3. Interface settings
 
 Non-default settings the rule set depends on.
 
-| Setting                     | Value                                    | Reason                                  |
-| --------------------------- | ---------------------------------------- | --------------------------------------- |
-| WAN: block private networks | Off                                      | WAN is a private range (192.168.1.0/24) |
-| WAN: block bogon networks   | On                                       | No legitimate bogon traffic expected    |
-| WAN IPv4                    | Static 192.168.1.10, gateway 192.168.1.2 | Fixed target for port forward and VPN   |
-| LAN default allow rules     | Removed                                  | Replaced by section 6                   |
-| Anti-lockout rule           | Disabled once VPN admin works            | P-ADM-01                                |
-| Default block rule logging  | On                                       | P-LOG-02                                |
-| IPv6                        | Not used; no IPv6 pass rules             | Reduces attack surface                  |
+| Setting                        | Value                                      | Reason                                                              |
+| ------------------------------ | ------------------------------------------ | ------------------------------------------------------------------- |
+| WAN IPv4                       | Static 203.0.113.1/24, no gateway          | Simulated internet; fixed target for the port forward and VPN       |
+| WAN: block private networks    | On                                         | Private addresses never arrive from a real internet                 |
+| WAN: block bogon networks      | Off                                        | 203.0.113.0/24 is a documentation range, which pfSense lists as bogon |
+| UPLINK IPv4                    | Static 192.168.1.10/24, gateway 192.168.1.2 | Real internet for maintenance                                       |
+| UPLINK: block private and bogon | On                                        | No inbound traffic expected (P-UPL-03)                              |
+| UPLINK VMware adapter          | Disconnected by default                    | P-UPL-02, P-UPL-04                                                  |
+| Default gateway                | UPLINK                                     | WAN has no upstream                                                 |
+| LAN default allow rules        | Disabled, kept for rollback                | Replaced by section 6                                               |
+| Anti-lockout rule              | Disabled once VPN admin works              | P-ADM-01                                                            |
+| Default block rule logging     | On                                         | P-LOG-02                                                            |
+| IPv6                           | Not used; no IPv6 pass rules               | Reduces attack surface                                              |
 
 ## 4. NAT
 
-| Type           | Interface | Protocol | Original destination                        | Port      | Translated to     | Policy   |
-| -------------- | --------- | -------- | ------------------------------------------- | --------- | ----------------- | -------- |
-| Port forward   | WAN       | TCP      | WAN address                                 | Web_Ports | web01 : Web_Ports | P-WAN-02 |
-| NAT reflection | All       | n/a      | Mode: Pure NAT                              | n/a       | n/a               | P-LAN-02 |
-| Outbound NAT   | WAN       | Any      | Automatic (internal subnets to WAN address) | n/a       | n/a               | P-LAN-01 |
+| Type           | Interface | Protocol | Original destination / source                   | Port      | Translated to     | Policy   |
+| -------------- | --------- | -------- | ----------------------------------------------- | --------- | ----------------- | -------- |
+| Port forward   | WAN       | TCP      | Destination: WAN address                        | Web_Ports | web01 : Web_Ports | P-WAN-02 |
+| NAT reflection | All       | n/a      | Mode: Pure NAT                                  | n/a       | n/a               | P-LAN-02 |
+| Outbound NAT   | WAN       | Any      | Source: 10.10.0.0/16 (all internal and VPN)     | Any       | WAN address       | P-UPL-01 |
+| Outbound NAT   | UPLINK    | Any      | Automatic                                       | Any       | UPLINK address    | P-UPL-02 |
 
-Port forwards are applied before filter rules, so reflected LAN traffic is matched by LAN rule 4 against web01, not the WAN address.
+Outbound NAT mode is Hybrid. Automatic outbound NAT only covers interfaces with a gateway, so WAN needs the manual rule; with it, traffic to the simulated internet appears from 203.0.113.1, as it would on a real connection. Port forwards are applied before filter rules, so reflected LAN traffic is matched by LAN rule 4 against web01, not the WAN address.
 
 ## 5. WAN rules
 
@@ -60,20 +66,23 @@ Rules are listed in evaluation order; first match wins. Anything unmatched hits 
 | 1   | Pass   | TCP   | Any    | web01       | Web_Ports | Yes | P-WAN-02 | Public web service (port forward) |
 | 2   | Pass   | UDP   | Any    | WAN address | 1194      | Yes | P-WAN-03 | OpenVPN                           |
 
+UPLINK has no pass rules, so the default deny blocks all inbound traffic (P-UPL-03).
+
 ## 6. LAN rules
 
-Rule 7 blocks all internal destinations, so rule 8 only reaches the internet.
+Rule 7 blocks all internal destinations, so rule 8 only reaches the internet. Rule 2a is temporary (exception E-01).
 
-| #   | Action | Proto   | Source  | Destination | Port        | Log | Policy   | Description                           |
-| --- | ------ | ------- | ------- | ----------- | ----------- | --- | -------- | ------------------------------------- |
-| 1   | Pass   | TCP     | LAN net | LAN address | 443         | No  | P-ADM-01 | Anti-lockout (temporary, system rule) |
-| 2   | Pass   | TCP/UDP | dc01    | LAN address | 53          | No  | P-LAN-04 | DNS forwarding from DC                |
-| 3   | Pass   | UDP     | dc01    | LAN address | 123         | No  | P-LAN-04 | NTP from DC                           |
-| 4   | Pass   | TCP     | LAN net | web01       | Web_Ports   | No  | P-LAN-02 | Company website (via NAT reflection)  |
-| 5   | Pass   | TCP     | dc01    | siem01      | Wazuh_Agent | No  | P-LAN-03 | SIEM agent                            |
-| 6   | Pass   | TCP     | dc01    | siem01      | Wazuh_Enrol | No  | P-LAN-03 | Agent enrolment (disable after)       |
-| 7   | Block  | Any     | LAN net | RFC1918     | Any         | Yes | P-LAN-01 | Block all other internal traffic      |
-| 8   | Pass   | Any     | LAN net | Any         | Any         | No  | P-LAN-01 | Internet access                       |
+| #   | Action | Proto   | Source      | Destination | Port        | Log | Policy   | Description                              |
+| --- | ------ | ------- | ----------- | ----------- | ----------- | --- | -------- | ---------------------------------------- |
+| 1   | Pass   | TCP     | LAN subnets | LAN address | 443, 80     | No  | P-ADM-01 | Anti-lockout (temporary, system rule)    |
+| 2   | Pass   | TCP/UDP | dc01        | LAN address | 53          | No  | P-LAN-04 | DNS forwarding from DC                   |
+| 2a  | Pass   | TCP/UDP | LAN subnets | LAN address | 53          | No  | E-01     | Client DNS until dc01 is promoted        |
+| 3   | Pass   | UDP     | dc01        | LAN address | 123         | No  | P-LAN-04 | NTP from DC                              |
+| 4   | Pass   | TCP     | LAN subnets | web01       | Web_Ports   | No  | P-LAN-02 | Company website (via NAT reflection)     |
+| 5   | Pass   | TCP     | dc01        | siem01      | Wazuh_Agent | No  | P-LAN-03 | SIEM agent                               |
+| 6   | Pass   | TCP     | dc01        | siem01      | Wazuh_Enrol | No  | P-LAN-03 | Agent enrolment (disable after)          |
+| 7   | Block  | Any     | LAN subnets | RFC1918     | Any         | Yes | P-LAN-01 | Block all other internal traffic         |
+| 8   | Pass   | Any     | LAN subnets | Any         | Any         | No  | P-LAN-01 | Internet access                          |
 
 ## 7. DMZ rules
 
@@ -83,7 +92,7 @@ Rule 7 blocks all internal destinations, so rule 8 only reaches the internet.
 | 2   | Pass   | UDP     | web01   | DMZ address | 123         | No  | P-DMZ-04 | NTP                                             |
 | 3   | Pass   | TCP     | web01   | siem01      | Wazuh_Agent | No  | P-DMZ-03 | SIEM agent (R-01)                               |
 | 4   | Pass   | TCP     | web01   | siem01      | Wazuh_Enrol | No  | P-DMZ-03 | Agent enrolment (disable after)                 |
-| 5   | Block  | Any     | DMZ net | RFC1918     | Any         | Yes | P-DMZ-01 | Block all other internal traffic, including LAN |
+| 5   | Block  | Any     | DMZ subnets | RFC1918     | Any         | Yes | P-DMZ-01 | Block all other internal traffic, including LAN |
 | 6   | Pass   | TCP     | web01   | Any         | Web_Ports   | No  | P-DMZ-02 | Updates                                         |
 
 ## 8. MGMT rules
@@ -94,7 +103,7 @@ Inbound agent traffic is permitted on the LAN and DMZ interfaces, where it enter
 | --- | ------ | ------- | -------- | ------------ | --------- | --- | ---------------- | -------------------------------- |
 | 1   | Pass   | TCP/UDP | siem01   | MGMT address | 53        | No  | P-MGT-04         | DNS                              |
 | 2   | Pass   | UDP     | siem01   | MGMT address | 123       | No  | P-MGT-04         | NTP                              |
-| 3   | Block  | Any     | MGMT net | RFC1918      | Any       | Yes | P-MGT-03         | Block all other internal traffic |
+| 3   | Block  | Any     | MGMT subnets | RFC1918      | Any       | Yes | P-MGT-03         | Block all other internal traffic |
 | 4   | Pass   | TCP     | siem01   | Any          | Web_Ports | No  | P-MGT-02         | Updates and detection content    |
 
 ## 9. OpenVPN rules
@@ -117,15 +126,16 @@ Traffic sent by fw01 itself is not filtered by interface rules.
 | Source                         | Destination | Proto   | Port         | Policy   | Description                           |
 | ------------------------------ | ----------- | ------- | ------------ | -------- | ------------------------------------- |
 | fw01 (MGMT address 10.10.30.1) | siem01      | UDP     | 514          | P-LOG-01 | Firewall logs to SIEM (remote syslog) |
-| fw01 (WAN address)             | Internet    | TCP/UDP | 53, 123, 443 | n/a      | Upstream DNS, NTP and pfSense updates |
+| fw01 (UPLINK address)          | Internet    | TCP/UDP | 53, 123, 443 | P-UPL-02 | Upstream DNS, NTP and pfSense updates (only while UPLINK is connected) |
 
 ## 11. Gaps and open items
 
-Items still open after policy v0.2.
+Items still open after policy v0.3.
 
 | Item                                      | Detail                                                                                   | Proposed resolution                                             |
 | ----------------------------------------- | ---------------------------------------------------------------------------------------- | --------------------------------------------------------------- |
 | "Updates only" is not enforceable by port | DMZ rule 6 and MGMT rule 4 allow 80/443 to any external address, not just update servers | Accept for baseline; tighten later with FQDN aliases or a proxy |
 | Wazuh dashboard access                    | P-ADM-03 needs a browser inside MGMT                                                     | SOC workstation VM in MGMT, or a desktop on siem01              |
 | Enrolment rules                           | LAN rule 6 and DMZ rule 4                                                                | Disable after agents enrol (R-01 mitigation)                    |
-| LAN to 192.168.1.0/24                     | LAN rule 7 blocks the simulated internet segment because it is a private range           | Accept; revisit when the attacker VM is added                   |
+| DNS while UPLINK is disconnected          | fw01 cannot resolve real internet names, so lookups fail during exercises                | Accept; add DNS on the simulated internet if a scenario needs it |
+| E-01 temporary DNS rule                   | LAN rule 2a                                                                              | Remove when dc01 is promoted                                    |

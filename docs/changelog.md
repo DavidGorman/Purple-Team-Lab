@@ -4,6 +4,12 @@ Every configuration change to the lab, newest first. Record the "before" state (
 
 | Date       | Host   | Change                                                                        | Reason / framework                                                            | Evidence                     | Validated                        |
 | ---------- | ------ | ----------------------------------------------------------------------------- | ----------------------------------------------------------------------------- | ---------------------------- | -------------------------------- |
+| 2026-11-09 | n/a    | Policy v0.3, rule set, register and README updated: WAN redefined as a simulated internet, maintenance uplink planned, E-01 recorded | Isolate the lab from the real internet; keep docs consistent | `docs/network-security-policy.md` | n/a |
+| 2026-11-09 | fw01   | LAN rules added per firewall-rules.md section 6, including temporary rule 2a (E-01); default allow LAN rules disabled | Default deny between zones (P-LAN-01 to P-LAN-04) | `docs/firewall-rules.md` | Pending ws01 tests |
+| 2026-11-03 | fw01   | NAT port forward WAN address:Web_Ports to web01, linked WAN rule with logging | P-WAN-02 | `journal/November 26/2026-11-03.md` | Yes, pass logged from kali to 10.10.10.10:80 |
+| 2026-11-03 | fw01   | WAN "Block private networks" off | WAN was on a private range (192.168.1.0/24) | `journal/November 26/2026-11-03.md` | Yes |
+| 2026-11-03 | fw01   | Host, network and port aliases created | firewall-rules.md section 2 | `journal/November 26/2026-11-03.md` | Yes |
+| 2026-11-03 | n/a    | Network security policy and firewall rule set written | Policy first, then rules, then implementation | `docs/network-security-policy.md` | n/a |
 | 2026-10-29 | n/a    | Commit history rewritten to GitHub noreply email; push protection for personal email enabled | Personal email was in commit metadata, repo is going public | `journal/October/2026-10-29.md` | Yes, `git ls-remote` matches clean local history |
 | 2026-10-29 | n/a    | Private working notes and command notes added to `.gitignore` | Keep live-system details out of the public repo | `.gitignore` | Yes, `git check-ignore` |
 | 2026-10-25 | n/a    | Repository created, network design and IP plan drafted                        | Project planning                                                              | `docs/network-register.md`   | n/a                              |
