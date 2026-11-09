@@ -1,15 +1,15 @@
 ## 1. Addressing
 
-WAN is a simulated internet and is treated as real (policy P-UPL-01). UPLINK is fw01's only real internet connection and stays disconnected except during maintenance (P-UPL-02). Servers use static addresses below each subnet's DHCP range (.100 to .200).
+WAN is a simulated internet and is treated as real (policy P-UPL-01). In pfSense the WAN zone is the interface named INTERNET (OPT3), and the interface pfSense calls WAN (em0) is renamed UPLINK: fw01's only real internet connection, disconnected except during maintenance (P-UPL-02). Servers use static addresses below each subnet's DHCP range (.100 to .200).
 
 | Zone   | Subnet                                    | fw01 interface                                 | Hosts                                          |
 | ------ | ----------------------------------------- | ---------------------------------------------- | ---------------------------------------------- |
-| WAN    | 203.0.113.0/24 (simulated internet)       | em0, 203.0.113.1                               | kali 203.0.113.50                              |
+| WAN    | 203.0.113.0/24 (simulated internet)       | OPT3 "INTERNET", 203.0.113.1                   | kali 203.0.113.50                              |
 | DMZ    | 10.10.10.0/24                             | em2, 10.10.10.1                                | web01 10.10.10.10                              |
-| LAN    | 10.10.20.0/24                             | em1, 10.10.20.1                                | dc01 10.10.20.10, ws01 10.10.20.50 (temporary) |
+| LAN    | 10.10.20.0/24                             | em1, 10.10.20.1                                | dc01 10.10.20.10, ws01 (DHCP, to confirm)     |
 | MGMT   | 10.10.30.0/24                             | em3, 10.10.30.1                                | siem01 10.10.30.10                             |
 | VPN    | 10.10.40.0/24 (OpenVPN tunnel)            | 10.10.40.1                                     | Remote clients                                 |
-| UPLINK | 192.168.1.0/24 (VMnet8 NAT), maintenance only | em4, 192.168.1.10, gateway 192.168.1.2     | None                                           |
+| UPLINK | 192.168.1.0/24 (VMnet8 NAT), maintenance only | em0 "UPLINK", 192.168.1.10, gateway 192.168.1.2 | None                                           |
 
 ## 2. Aliases
 
@@ -26,7 +26,7 @@ Rules refer to these aliases by name.
 | Wazuh_Enrol | Port    | 1515                                      | Agent enrolment (temporary)         |
 | Win_Admin   | Port    | 3389, 5985, 5986                          | RDP and PowerShell remoting (WinRM) |
 
-Built-in names also used: _WAN address_, _LAN address_, _DMZ address_, _MGMT address_ (fw01's own IP on that interface) and _LAN subnets_, _DMZ subnets_, _MGMT subnets_ (the whole subnet).
+Built-in names also used: _INTERNET address_, _LAN address_, _DMZ address_, _MGMT address_ (fw01's own IP on that interface) and _LAN subnets_, _DMZ subnets_, _MGMT subnets_ (the whole subnet).
 
 ## 3. Interface settings
 
@@ -34,13 +34,13 @@ Non-default settings the rule set depends on.
 
 | Setting                        | Value                                      | Reason                                                              |
 | ------------------------------ | ------------------------------------------ | ------------------------------------------------------------------- |
-| WAN IPv4                       | Static 203.0.113.1/24, no gateway          | Simulated internet; fixed target for the port forward and VPN       |
-| WAN: block private networks    | On                                         | Private addresses never arrive from a real internet                 |
-| WAN: block bogon networks      | Off                                        | 203.0.113.0/24 is a documentation range, which pfSense lists as bogon |
+| INTERNET IPv4                  | Static 203.0.113.1/24, no gateway          | Simulated internet; fixed target for the port forward and VPN       |
+| INTERNET: block private networks | On                                         | Private addresses never arrive from a real internet                 |
+| INTERNET: block bogon networks | Off                                        | 203.0.113.0/24 is a documentation range, which pfSense lists as bogon |
 | UPLINK IPv4                    | Static 192.168.1.10/24, gateway 192.168.1.2 | Real internet for maintenance                                       |
 | UPLINK: block private and bogon | On                                        | No inbound traffic expected (P-UPL-03)                              |
 | UPLINK VMware adapter          | Disconnected by default                    | P-UPL-02, P-UPL-04                                                  |
-| Default gateway                | UPLINK                                     | WAN has no upstream                                                 |
+| Default gateway                | UPLINK                                     | INTERNET has no upstream                                            |
 | LAN default allow rules        | Disabled, kept for rollback                | Replaced by section 6                                               |
 | Anti-lockout rule              | Disabled once VPN admin works              | P-ADM-01                                                            |
 | Default block rule logging     | On                                         | P-LOG-02                                                            |
@@ -50,21 +50,21 @@ Non-default settings the rule set depends on.
 
 | Type           | Interface | Protocol | Original destination / source                   | Port      | Translated to     | Policy   |
 | -------------- | --------- | -------- | ----------------------------------------------- | --------- | ----------------- | -------- |
-| Port forward   | WAN       | TCP      | Destination: WAN address                        | Web_Ports | web01 : Web_Ports | P-WAN-02 |
+| Port forward   | INTERNET  | TCP      | Destination: INTERNET address                        | Web_Ports | web01 : Web_Ports | P-WAN-02 |
 | NAT reflection | All       | n/a      | Mode: Pure NAT                                  | n/a       | n/a               | P-LAN-02 |
-| Outbound NAT   | WAN       | Any      | Source: 10.10.0.0/16 (all internal and VPN)     | Any       | WAN address       | P-UPL-01 |
+| Outbound NAT   | INTERNET  | Any      | Source: 10.10.0.0/16 (all internal and VPN)     | Any       | INTERNET address       | P-UPL-01 |
 | Outbound NAT   | UPLINK    | Any      | Automatic                                       | Any       | UPLINK address    | P-UPL-02 |
 
-Outbound NAT mode is Hybrid. Automatic outbound NAT only covers interfaces with a gateway, so WAN needs the manual rule; with it, traffic to the simulated internet appears from 203.0.113.1, as it would on a real connection. Port forwards are applied before filter rules, so reflected LAN traffic is matched by LAN rule 4 against web01, not the WAN address.
+Outbound NAT mode is Hybrid. Automatic outbound NAT only covers interfaces with a gateway, so INTERNET needs the manual rule; with it, traffic to the simulated internet appears from 203.0.113.1, as it would on a real connection. Port forwards are applied before filter rules, so reflected LAN traffic is matched by LAN rule 4 against web01, not the INTERNET address.
 
-## 5. WAN rules
+## 5. INTERNET rules (WAN zone)
 
 Rules are listed in evaluation order; first match wins. Anything unmatched hits the default deny, which is logged.
 
 | #   | Action | Proto | Source | Destination | Port      | Log | Policy   | Description                       |
 | --- | ------ | ----- | ------ | ----------- | --------- | --- | -------- | --------------------------------- |
 | 1   | Pass   | TCP   | Any    | web01       | Web_Ports | Yes | P-WAN-02 | Public web service (port forward) |
-| 2   | Pass   | UDP   | Any    | WAN address | 1194      | Yes | P-WAN-03 | OpenVPN                           |
+| 2   | Pass   | UDP   | Any    | INTERNET address | 1194      | Yes | P-WAN-03 | OpenVPN                           |
 
 UPLINK has no pass rules, so the default deny blocks all inbound traffic (P-UPL-03).
 
